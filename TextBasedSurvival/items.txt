@@ -1,0 +1,381 @@
+//Quick Copy Templets:
+
+//-i
+itemName:
+itemPuralCase:
+otherNameCount:
+otherName:
+otherNamePuralCase:
+itemDescription:
+itemClass:
+//-d
+
+//-c
+craftForItem:
+craftDialogue:
+craftClassReq:
+recipeElementAmount:
+elementName:
+elementNumRq:
+recipeCreateAmount:
+craftOtherAmount:
+craftOtherName:
+craftOtherNum:
+//-d
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+
+-i
+itemName: Stick
+itemPuralCase: Sticks
+itemDescription: It's a stick.  Not much else to say
+itemClass: Material
+-d
+
+-i
+itemName: Stone
+itemPuralCase: Stones
+otherNameCount: 1
+otherName: Rock
+otherNamePuralCase: Rocks
+itemDescription: It's a stone.  Cool and hard
+itemClass: Material
+-d
+
+-i
+itemName: Flint
+itemDescription: It's a flaky peice of flint
+itemClass: Material
+-d
+
+-i
+itemName: Tree Resin
+otherNameCount: 1
+otherName: Tree Sap
+itemDescription: Eww! Sticky, but darn flamable
+itemClass: Material
+-d
+
+-i
+itemName: Unlit Torch
+itemPuralCase: Unlit Torches
+itemDescription: Its a torch that has not been lit
+itemClass: Material
+-d
+
+-i
+itemName: Flint Axe
+itemPuralCase: Flint Axes
+itemDescription: Axe me again later
+itemClass: Axe
+-d
+
+-i
+itemName: Cut Grass
+itemDescription: Simply cut grass
+itemClass: Material
+-d
+
+-i
+itemName: Twine
+otherNameCount: 2
+otherName: Thread
+otherName: String
+itemDescription: Twisted cut grass to make a reasonably strong binding material
+itemClass: Material
+-d
+
+-i
+itemName: Wooden Handle
+itemPuralCase: Wooden Handles
+itemDescription: Its a comfortable-to-hold carved wooden handle
+itemClass: Material
+-d
+
+-i
+itemName: Bow String
+itemPuralCase: Bow Strings
+itemDescription: x
+itemClass: Material
+-d
+
+-i
+itemName: Unstrung Bow
+itemPuralCase: Unstrung Bows
+otherNameCount: 2
+otherName: Bow Limb
+otherNamePuralCase: Bow Limbs
+otherName: Bow Body
+otherNamePuralCase: Bow Bodies
+itemDescription: x
+itemClass: Material
+-d
+
+-i
+itemName: Strung Bow
+itemPuralCase: Strung Bows
+otherNameCount: 1
+otherName: Bow
+otherNamePuralCase: Bows
+itemDescription: x
+itemClass: Material
+-d
+
+-i
+itemName: Flint Arrow
+itemPuralCase: Flint Arrows
+itemDescription: x
+itemClass: Material
+-d
+
+-i
+itemName: Flint Knife
+itemPuralCase: Flint Knives
+itemDescription: x
+itemClass: Knife
+-d
+
+-i
+itemName: Feather
+itemPuralCase: Feathers
+itemDescription: x
+itemClass: Material
+-d
+
+-i
+itemName: Wood Shaving
+itemPuralCase: Wood Shavings
+otherNameCount: 1
+otherName: Wood Chip
+otherNamePuralCase: Wood Chips
+itemDescription: These are more useful on a playground
+itemClass: Material
+-d
+
+-i
+itemName: Stone Knife Head
+itemPuralCase: Stone Knife Heads
+itemDescription: A head is useless with out its body
+itemClass: Material
+-d
+
+-i
+itemName: Stone Knife
+itemPuralCase: Stone Knives
+itemDescription: x
+itemClass: Knife
+-d
+
+-i
+itemName: Stone Arrow Head
+itemPuralCase: Stone Arrow Heads
+itemDescription: A head is useless with out its body
+itemClass: Material
+-d
+
+-i
+itemName: Stone Arrow
+itemPuralCase: Stone Arrows
+itemDescription: These don't really fly straight
+itemClass: Material
+-d
+
+-i
+itemName: Stone Axe Head
+itemPuralCase: Stone Axe Heads
+itemDescription: A head is useless with out its body
+itemClass: Material
+-d
+
+-i
+itemName: Stone Axe
+itemPuralCase: Stone Axes
+itemDescription: Axe me again later
+itemClass: Axe
+-d
+
+/////////// CRAFTING SECTIONS ///////////////////////
+///////////                   ///////////////////////
+
+-c
+craftForItem: Unlit Torch
+craftDialogue: You smear a sticky glob of tree resin to an end of the stick
+recipeElementAmount: 2
+elementName: Stick
+elementNumRq: 1
+elementName: Tree Sap
+elementNumRq: 1
+recipeCreateAmount: 1
+-d
+
+-c
+craftForItem: Flint Axe
+craftDialogue: You carve a slot out from one end of the wooden handle and fit the flint through the slot.  After the flint is firmly in the slot, you secure the flint with the twine
+craftClassReq: Knife
+recipeElementAmount: 3
+elementName: Wooden Handle
+elementNumRq: 1
+elementName: Flint
+elementNumRq: 1
+elementName: Twine
+elementNumRq: 2
+recipeCreateAmount: 1
+-d
+
+-c
+craftForItem: Twine
+craftDialogue: Twisted cut grass to make a reasonably strong binding material
+recipeElementAmount: 1
+elementName: Cut Grass
+elementNumRq: 2
+recipeCreateAmount: 1
+-d
+
+-c
+craftForItem: Wooden Handle
+craftDialogue: You spend some time wittleing away at the stick until you create a confortable wooden handle
+craftClassReq: Knife
+recipeElementAmount: 1
+elementName: Stick
+elementNumRq: 1
+recipeCreateAmount: 1
+craftOtherAmount: 1
+craftOtherName: Wood Shaving
+craftOtherNum: 2
+-d
+
+-c
+craftForItem: Bow String
+craftDialogue: You tie the twine together and twist as hard as you can to make a taungt, when streached out, bow string
+recipeElementAmount: 1
+elementName: Twine
+elementNumRq: 6
+recipeCreateAmount:1
+-d
+
+-c
+craftForItem: Unstrung Bow
+craftDialogue: You spend a great amount of time creating 2 bow limbs and rework the wooden handle to allow for interlocking bow limbs to be situated at both ends
+craftClassReq: Knife
+recipeElementAmount: 2
+elementName: Stick
+elementNumRq: 2
+elementName: Wooden Handle
+elementNumRq: 1
+recipeCreateAmount: 1
+craftOtherAmount: 1
+craftOtherName: Wood Shaving
+craftOtherNum: 4
+-d
+
+-c
+craftForItem: Strung Bow
+craftDialogue: You string up the bow
+recipeElementAmount: 2
+elementName: Unstrung Bow
+elementNumRq: 1
+elementName: Bow String
+elementNumRq: 1
+recipeCreateAmount: 1
+-d
+
+-c
+craftForItem: Flint Arrow
+craftDialogue: x
+craftClassReq: Knife
+recipeElementAmount: 3
+elementName: Flint
+elementNumRq: 1
+elementName: Stick
+elementNumRq: 1
+elementName: Feather
+elementNumRq: 4
+recipeCreateAmount: 1
+craftOtherAmount: 1
+craftOtherName: Wood Shaving
+craftOtherNum: 1
+-d
+
+-c
+craftForItem: Flint Knife
+craftDialogue: x
+recipeElementAmount: 3
+elementName: Flint
+elementNumRq: 1
+elementName: Stick
+elementNumRq: 1
+elementName: Twine
+elementNumRq: 1
+recipeCreateAmount: 1
+-d
+
+-c
+craftForItem: Stone Knife Head
+craftDialogue: x
+recipeElementAmount: 1
+elementName: Stone
+elementNumRq: 2
+recipeCreateAmount: 1
+-d
+
+-c
+craftForItem: Stone Knife
+craftDialogue: x
+recipeElementAmount: 3
+elementName: Stone Knife Head
+elementNumRq: 1
+elementName: Stick
+elementNumRq: 1
+elementName: Twine
+elementNumRq: 1
+recipeCreateAmount: 1
+-d
+
+-c
+craftForItem: Stone Arrow Head
+craftDialogue: x
+recipeElementAmount: 1
+elementName: Stone
+elementNumRq: 2
+recipeCreateAmount: 1
+-d
+
+-c
+craftForItem: Stone Arrow
+craftDialogue: x
+craftClassReq: Knife
+recipeElementAmount: 3
+elementName: Stone Arrow Head
+elementNumRq: 1
+elementName: Stick
+elementNumRq: 1
+elementName: Feather
+elementNumRq: 4
+recipeCreateAmount: 1
+craftOtherAmount: 1
+craftOtherName: Wood Shaving
+craftOtherNum: 1
+-d
+
+-c
+craftForItem: Stone Axe Head
+craftDialogue: x
+recipeElementAmount: 1
+elementName: Stone
+elementNumRq: 2
+recipeCreateAmount: 1
+-d
+
+-c
+craftForItem: Stone Axe
+craftDialogue: x
+recipeElementAmount: 3
+elementName: Stone Axe Head
+elementNumRq: 1
+elementName: Wooden Handle
+elementNumRq: 1
+elementName: Twine
+elementNumRq: 2
+recipeCreateAmount: 1
+-d

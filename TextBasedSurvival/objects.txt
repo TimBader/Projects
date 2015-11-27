@@ -1,0 +1,134 @@
+//-o
+objectName:
+objectPuralCase:
+otherNameAmount:
+otherName:
+otherNamePural:
+objectDescription:
+//-d
+
+//-h
+objectFor:
+harvestDialogue:
+harvestClassReq:
+harvestDropsAmount:
+harvestName:
+harvestNum:
+//-d
+
+//-c
+objectFor:
+constructDialogue:
+constructClassReq:
+constructElementAmount:
+constructName:
+constructNum:
+//-d
+
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
+-o
+objectName: Tall Grass
+objectDescription: Tall and wavy strains of grass
+-d
+
+-o
+objectName: Boulder
+objectPuralCase: Boulders
+objectDescription: Big and unmovable.  Too bad I can't drive this.
+-d
+
+-o
+objectName: Wheat
+objectDescription: Not quite edible yet
+-d
+
+-o
+objectName: Stone Pile
+objectPuralCase: Stone Piles
+otherNameAmount: 1
+otherName: Rock Pile
+otherNamePural: Rock Piles
+objectDescription: A pile of differnt sized stones
+-d
+
+-o
+objectName: Tree
+objectPuralCase: Trees
+otherNameAmount: 1
+otherName: Arbor
+otherNamePural: Arbors
+objectDescription: Its a fucking tree
+-d
+
+-o
+objectName: Fallen Tree
+objectPuralCase: Fallen Trees
+objectDescription: Yep its a tree that has been felled
+-d
+
+-o
+objectName: Furnace
+objectPuralCase: Furnaces
+objectDescription: Burn baby BURN!!
+-d
+
+////////////////////Harvesting////////////////////////////////
+//////////////////////////////////////////////////////////////
+
+-h
+objectFor: Tree
+harvestDialogue: You cut down the tree
+harvestClassReq: Axe
+harvestDropsAmount: 2
+harvestName: Fallen Tree
+harvestNum: 1
+harvestName: Stick
+harvestNum: 20
+-d
+
+-h
+objectFor: Furnace
+harvestDialogue: POOP!
+harvestClassReq: Axe
+harvestDropsAmount: 1
+harvestName: Stone
+harvestNum: 3
+-d
+
+-h
+objectFor: Fallen Tree
+harvestDialogue: You really suck at chopping fallen trees you ended up making a bunch of sticks
+harvestClassReq: Axe
+harvestDropsAmount: 1
+harvestName: Stick
+harvestNum: 200
+-d
+
+-h
+objectFor: Tall Grass
+harvestDialogue: You pull the grass up
+harvestDropsAmount: 1
+harvestName: Cut Grass
+harvestNum: 3
+-d
+
+-h
+objectFor: Stone Pile
+harvestDialogue: You sift throught the stone pile seperating the ones that are a decent size
+harvestDropsAmount: 1
+harvestName: Stone
+harvestNum: 7
+-d
+
+///////////////////////////////////Construct//////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+-c
+objectFor: Furnace
+constructDialogue: Meow the meow meow meow
+constructElementAmount: 1
+constructName: Stone
+constructNum: 40
+-d

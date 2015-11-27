@@ -1,0 +1,6 @@
+mainImg: lab_wall_door_open.png
+solid: true
+door: True
+doorLeadDirection: east
+doorOpenImg: lab_wall_door_open.png
+doorCloseImg.lab_wall_door_closed.png

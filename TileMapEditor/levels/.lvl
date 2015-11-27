@@ -1,0 +1,28 @@
+mapWidth 14
+mapHeight 10
+
+layer True backgrounds
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+layer False decals
+
+layer True tileBasedObjects
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+layer False entities

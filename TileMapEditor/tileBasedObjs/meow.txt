@@ -1,0 +1,2 @@
+mainImg: lab_capsule.png
+solid : true

@@ -1,0 +1,10 @@
+precision highp float;
+
+varying float v_viewPosz;
+
+uniform vec3 hitheryon;
+
+void main(){
+	float z = (v_viewPosz - hitheryon[0])/hitheryon[2];
+	gl_FragColor = vec4(z,z*z,0.0,1.0);
+}

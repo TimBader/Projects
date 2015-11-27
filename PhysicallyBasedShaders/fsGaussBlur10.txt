@@ -1,0 +1,32 @@
+precision highp float;
+uniform sampler2D image;
+uniform float ISize;
+uniform vec2 deltas;
+
+varying vec2 v_texcord;
+
+void main(){
+    vec4 color = vec4(0,0,0,0);
+    color += 0.001331642384180115 * texture2D(image, v_texcord.st + -10.0 * deltas * ISize);
+    color += 0.003131189786248802 * texture2D(image, v_texcord.st + -9.0 * deltas * ISize);
+    color += 0.0067289092366265586 * texture2D(image, v_texcord.st + -8.0 * deltas * ISize);
+    color += 0.01321579963304265 * texture2D(image, v_texcord.st + -7.0 * deltas * ISize);
+    color += 0.02372224120933465 * texture2D(image, v_texcord.st + -6.0 * deltas * ISize);
+    color += 0.03891629493039994 * texture2D(image, v_texcord.st + -5.0 * deltas * ISize);
+    color += 0.0583472982820951 * texture2D(image, v_texcord.st + -4.0 * deltas * ISize);
+    color += 0.07995092874022598 * texture2D(image, v_texcord.st + -3.0 * deltas * ISize);
+    color += 0.10012436424202198 * texture2D(image, v_texcord.st + -2.0 * deltas * ISize);
+    color += 0.1145960178847836 * texture2D(image, v_texcord.st + -1.0 * deltas * ISize);
+    color += 0.11987062734208122 * texture2D(image, v_texcord.st + 0.0 * deltas * ISize);
+    color += 0.1145960178847836 * texture2D(image, v_texcord.st + 1.0 * deltas * ISize);
+    color += 0.10012436424202198 * texture2D(image, v_texcord.st + 2.0 * deltas * ISize);
+    color += 0.07995092874022598 * texture2D(image, v_texcord.st + 3.0 * deltas * ISize);
+    color += 0.0583472982820951 * texture2D(image, v_texcord.st + 4.0 * deltas * ISize);
+    color += 0.03891629493039994 * texture2D(image, v_texcord.st + 5.0 * deltas * ISize);
+    color += 0.02372224120933465 * texture2D(image, v_texcord.st + 6.0 * deltas * ISize);
+    color += 0.01321579963304265 * texture2D(image, v_texcord.st + 7.0 * deltas * ISize);
+    color += 0.0067289092366265586 * texture2D(image, v_texcord.st + 8.0 * deltas * ISize);
+    color += 0.003131189786248802 * texture2D(image, v_texcord.st + 9.0 * deltas * ISize);
+    color += 0.001331642384180115 * texture2D(image, v_texcord.st + 10.0 * deltas * ISize);
+    gl_FragColor = color;
+}

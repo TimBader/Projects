@@ -1,0 +1,47 @@
+#extension GL_EXT_draw_buffers:require
+precision highp float;
+
+uniform int mode;
+uniform sampler2D texture;
+uniform sampler2D specMap;
+uniform sampler2D emisMap;
+//uniform sampler2D specColorMap;
+uniform sampler2D normalMap;
+uniform vec4 eyePos;
+uniform mat4 worldMatrix;
+
+uniform samplerCube enviromentMap;
+
+varying vec2 v_texPos;
+varying vec4 v_worldPos;
+varying vec4 v_normal;
+varying vec4 v_tangent;
+
+void main(){
+	//vec4 specColor = texture2D(specColorMap, v_texPos);
+	
+	vec4 newNormal;
+	vec4 normalMapColor = texture2D(normalMap, v_texPos);
+	normalMapColor = normalMapColor*2.0-vec4(1.0,1.0,1.0,1.0);//Remaping to (-1..1)range
+	
+	vec4 tangent = v_tangent - dot(v_tangent, v_normal) * v_normal;
+	tangent = normalize(tangent);
+	
+	vec4 biTangent = vec4(cross(tangent.xyz, v_normal.xyz),0.0);
+	biTangent = normalize(biTangent);
+	
+	mat3 Q = mat3(tangent.x,biTangent.x,v_normal.x,tangent.y,biTangent.y,v_normal.y,tangent.z,biTangent.z,v_normal.z);
+	vec4 newNewNormal = vec4(normalMapColor.xyz*Q,0.0);
+	newNewNormal = newNewNormal*worldMatrix;
+	newNewNormal = normalize(newNewNormal);
+	
+	vec4 viewVector = v_worldPos-eyePos;
+	vec4 envColor = textureCube(enviromentMap,reflect(viewVector, newNewNormal).xyz);
+
+	float smoothness = texture2D(specMap, v_texPos).r;
+	
+	gl_FragData[0] = vec4(v_worldPos.xyz, envColor.r);//[3] = spec r but now just specPower
+	gl_FragData[1] = vec4(newNewNormal.xyz, envColor.g);//[3] = spec g
+	gl_FragData[2] = vec4(texture2D(texture, v_texPos).rgb, envColor.b); //[3] = spec b
+	gl_FragData[3] = vec4(texture2D(emisMap, v_texPos).rgb, clamp(smoothness*smoothness, 0.02, .95)); //[3] = spec power
+}

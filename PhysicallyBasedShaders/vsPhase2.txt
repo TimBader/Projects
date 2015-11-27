@@ -1,0 +1,9 @@
+attribute vec3 position;
+attribute vec2 texcord;
+
+varying vec2 v_texcord;
+
+void main(){
+    gl_Position = vec4(position.xyz,1);
+    v_texcord = texcord;
+}

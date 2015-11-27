@@ -1,0 +1,23 @@
+precision highp float;
+
+uniform sampler2D texture;
+uniform vec4 lightPos;
+
+varying vec2 v_texPos;
+varying vec4 v_normal;
+varying vec4 v_worldPos;
+varying vec4 v_tangent;
+
+void main(){
+    vec4 c = texture2D(texture,v_texPos);
+    
+    vec3 L = normalize(lightPos.xyz-v_worldPos.xyz);
+    vec3 N = normalize(v_normal.xyz);
+    float dp = dot(L,N);
+    dp = max(0.0,dp);
+    
+    gl_FragColor.rgb = dp*c.rgb;
+    gl_FragColor.a = 1.0;
+    
+    
+}

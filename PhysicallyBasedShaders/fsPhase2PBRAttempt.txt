@@ -1,0 +1,131 @@
+#extension GL_EXT_frag_depth : require
+precision highp float;
+uniform sampler2D posTexture;
+uniform sampler2D normalTexture;
+uniform sampler2D colorTexture;
+uniform sampler2D emisTexture;
+uniform vec4 lightPos;
+uniform vec4 lightColor;
+uniform vec4 lightShineDirection;
+uniform vec3 lightAttenuate;
+uniform vec2 windowSize;
+uniform vec4 eyePos;
+uniform sampler2D depth_texture;
+uniform float ambientDiffuseMaxPower;
+uniform float lightNum;
+
+varying vec2 v_texcord;
+
+float MaxFogDistanceSqrd = 90000.0;
+
+
+float Fresnel_Schlick(float FresnelCoeffat0, float FresnelCoeffat90, float xDoty){
+	return FresnelCoeffat0 + (FresnelCoeffat90 - FresnelCoeffat0) * pow(1.0 - xDoty, 5.0);
+}
+
+void main(){
+	//gl_FragColor = vec4(0.0,0.0,0.0,0.0);
+	//vec2 texcord = gl_FragCoord.xy * windowSize;
+	vec4 v1 = texture2D(posTexture, v_texcord);
+	vec4 v2 = texture2D(normalTexture, v_texcord);
+	vec4 v3 = texture2D(colorTexture, v_texcord);
+	vec4 v4 = texture2D(emisTexture, v_texcord);
+	vec4 worldPos = vec4(v1.xyz,1.0);
+	vec3 normal = normalize(v2.xyz);
+	vec3 color = v3.rgb;
+	vec3 specColor = lightColor.rgb - (vec3(1.0,1.0,1.0) - vec3(v1.a,v2.a,v3.a));
+	specColor.r = clamp(specColor.r,0.0,1.0);
+	specColor.g = clamp(specColor.g,0.0,1.0);
+	specColor.b = clamp(specColor.b,0.0,1.0);
+	vec3 EmissiveColor = vec3(v4.r,v4.g,v4.b);
+	float specPower = 32.0;
+	
+	//New PBR computations
+	
+	float roughness = 0.50;
+	float linearRoughness = 0.00;
+	
+	vec3 viewVector = normalize(eyePos.xyz - worldPos.xyz);	
+	vec3 lightVector = (lightPos - worldPos*lightPos.w).xyz;
+	float lightDistance = length(lightVector);
+	lightVector = lightVector/lightDistance;
+	vec3 halfAngleVector = normalize(viewVector + lightVector);
+	
+	float NdotV = abs(dot(normal, viewVector)-0.00001);
+	float LdotH = clamp(dot(lightVector, halfAngleVector), 0.0, 1.0);
+	float NdotH = clamp(dot(normal, halfAngleVector), 0.0, 1.0);
+	float NdotL = clamp(dot(normal, lightVector), 0.0, 1.0);
+	
+	float SpecFresnelCoeff = Fresnel_Schlick(1.33, 1.0, LdotH);
+	
+	//Optimized version of G_SmithGGX Correlated
+	float alphaG2 = roughness * roughness;
+	float Lambda_GGXL = NdotL * sqrt((-1.0*NdotV *alphaG2 + NdotV) * NdotV + alphaG2);
+	float Lambda_GGXV = NdotV * sqrt((-1.0*NdotL *alphaG2 + NdotL) * NdotL + alphaG2);
+	
+	float Vis = 0.5/(Lambda_GGXL + Lambda_GGXV);
+	
+	//D_GGX
+	float m2 = roughness * roughness;
+	float f = (NdotH * m2 - NdotH) * NdotH + 1.0;
+	
+	float D = m2 / (f * f);
+	float SpecularCoeff = D * SpecFresnelCoeff * Vis / 3.14159;
+	
+	//Diffuse
+	//Disney Diffuse
+	//float energyBias = mix(0.0, 0.5, linearRoughness);
+	//float energyFactor = mix(1.0, 1.0 / 1.51, linearRoughness);
+	float energyBias = (0.5 + linearRoughness)/3.0;
+	float energyFactor = (1.0 + 1.0/1.51 + linearRoughness)/3.0;
+	
+	float fd90 = energyBias + 2.0 * LdotH * LdotH * linearRoughness;
+	float lightScatter = Fresnel_Schlick(1.404, fd90, NdotL);
+	float viewScatter = Fresnel_Schlick(1.404, fd90, NdotV);
+	
+	float DiffuseCoeff = (lightScatter * viewScatter * energyFactor) / 3.14156;
+
+	float AttenuationCoeff = clamp(1.0/(lightAttenuate[2]*lightDistance*lightDistance + lightAttenuate[1]*lightDistance + lightAttenuate[0]),0.0,1.0);
+
+	vec3 FresnelColor = vec3(0.0,1.0,1.0);
+	
+	vec3 newColor = (DiffuseCoeff*lightColor.rgb*color.rgb+SpecularCoeff*specColor.rgb*v4.a)*AttenuationCoeff + EmissiveColor/lightNum;	
+	gl_FragColor.rgb = newColor;
+	gl_FragColor.a = 1.0;
+	gl_FragDepthEXT = texture2D(depth_texture,v_texcord).r;		
+	
+	
+	//vec3 viewVector = eyePos.xyz - worldPos.xyz;
+	//vec3 viewVectorNormaled = normalize(viewVector);
+	//vec3 lightVector = (lightPos - worldPos*lightPos.w).xyz;
+	//float lightDistance = length(lightVector);
+	//lightVector /= lightDistance;
+	//float AttenuationCoeff = clamp(1.0/(lightAttenuate[2]*lightDistance*lightDistance + lightAttenuate[1]*lightDistance + lightAttenuate[0]),0.0,1.0);
+	//float LdotN = dot(lightVector, normal);
+	//vec3 reflectVector = LdotN*normal*2.0-lightVector.xyz;
+	//float SpecularCoeff = pow(clamp(dot(viewVectorNormaled,reflectVector), 0.0, 1.0), specPower);
+		
+	//Poor Fresnel effect with colored light test
+	//vec3 FresnelColor = vec3(0.0,1.0,1.0);
+	//vec3 halfAngle = lightVector + viewVector;
+	//halfAngle = normalize(halfAngle);
+	//float R0 = (1.0-1.3333)/(1.0+1.3333);
+	//R0 *= R0;
+	//float FresnelCoeff = R0 + (1.0 - R0) * pow((1.0 - dot(normal, viewVectorNormaled)), 5.0);
+	//FresnelCoeff = clamp(FresnelCoeff,0.0,1.0);
+	
+	//Poor fog effect calculating
+	//vec3 FogColor = vec3(0.0,1.0,1.0);
+	//float FogCoeff = clamp(dot(viewVector, viewVector)/90000.0,0.0,1.0);
+	
+	//Diffuse with ambient testing
+	//float DiffuseCoeff = ambientDiffuseMaxPower + clamp(LdotN, 0.0, 1.0-ambientDiffuseMaxPower);	
+	
+	//vec3 newColor = ((((DiffuseCoeff*lightColor.rgb*color.rgb+SpecularCoeff*specColor.rgb*v4.a)*AttenuationCoeff)*(1.0-FresnelCoeff))+(FresnelColor*FresnelCoeff)/lightNum + EmissiveColor/lightNum)*(1.0-FogCoeff)+(FogColor*FogCoeff)/lightNum;	
+	
+	//gl_FragColor.rgb = newColor;
+	
+	//gl_FragColor.a = 1.0;
+	
+	//gl_FragDepthEXT = texture2D(depth_texture,v_texcord).r;	
+}

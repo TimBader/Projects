@@ -1,0 +1,63 @@
+precision highp float;
+uniform sampler2D texture;
+uniform sampler2D emisMap;
+uniform sampler2D specMap;
+uniform sampler2D specColorMap;
+uniform vec4 lightPos;
+uniform vec4 lightColor;
+uniform vec4 lightShineDirection;
+uniform vec3 lightAttenuate;
+uniform vec4 eyePos;
+uniform sampler2D depth_texture;
+uniform float ambientDiffuseMaxPower;
+
+uniform samplerCube enviromentMap;
+
+varying vec4 v_worldPos;
+varying vec4 v_normal;
+varying vec2 v_texcord;
+
+void main(){
+	vec4 color = texture2D(texture, v_texcord);
+	vec4 worldPos = v_worldPos;
+	vec3 normal = normalize(v_normal).xyz;
+	//vec3 specColor = lightColor.rgb - (vec3(1.0,1.0,1.0) - texture2D(specColorMap, v_texcord).rgb);
+	
+	vec3 emissive = texture2D(emisMap, v_texcord).rgb;
+	
+	float specA = texture2D(specMap, v_texcord).r;
+
+	float specPower = 32.0;
+	
+	float smoothness = 0.16*specA*specA;
+	
+	vec3 normal2 = normal*2.0;
+	vec3 viewVector = normalize(eyePos.xyz - worldPos.xyz);
+	vec3 lightVector = (lightPos - worldPos*lightPos.w).xyz;
+	float lightDistance = length(lightVector);
+	lightVector /= lightDistance;
+	float f = clamp(1.0/(lightAttenuate[2]*lightDistance*lightDistance + lightAttenuate[1]*lightDistance + lightAttenuate[0]),0.0,1.0);
+	float LdotN = dot(lightVector, normal);
+
+	//Diffuse with ambient testing
+	float Diffuse = ambientDiffuseMaxPower + clamp(LdotN, 0.0, 1.0-ambientDiffuseMaxPower);
+	
+	vec4 envColor = textureCube(enviromentMap, reflect(-1.0*viewVector, normal));
+	
+	//Poor Fresnel effect with colored light test
+	float R0 = specA;
+	float FresnelCoeff = R0 + (1.0 - R0) * pow((1.0 - dot(normal, viewVector)), 5.0);
+	//float gloss = 0.1;
+	//float FresnelCoeff = R0 + (max(gloss, R0) - R0) * pow((1.0 - dot(normal, viewVectorNormaled)), 5.0);
+
+	FresnelCoeff = clamp(FresnelCoeff,0.0,1.0);
+	
+	//Poor fog effect calculating
+	vec3 FogColor = vec3(0.0,.1,.1);
+	float FogCoeff = clamp(length(eyePos.xyz - worldPos.xyz)/90000.0,0.0,1.0);
+		
+	vec3 newColor = ((((Diffuse*lightColor.rgb*color.rgb)*f)*(1.0-FresnelCoeff))+(envColor.rgb*FresnelCoeff)+emissive)*(1.0-FogCoeff)+(FogColor*FogCoeff);
+
+	gl_FragColor.rgb = newColor;
+	gl_FragColor.a = color.a;
+}

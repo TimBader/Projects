@@ -1,0 +1,14 @@
+attribute vec3 position;
+
+uniform mat4 viewMatrix;
+uniform mat4 worldMatrix;
+uniform mat4 projMatrix;
+
+varying float v_viewPosz;
+
+void main(){
+	vec4 p = vec4(position,1.0)*worldMatrix;
+	p = p*viewMatrix;
+	v_viewPosz = -p.z;
+	gl_Position = p * projMatrix;
+}

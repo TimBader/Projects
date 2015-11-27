@@ -1,0 +1,22 @@
+precision highp float;
+uniform sampler2D image;
+uniform float ISize;
+uniform vec2 deltas;
+
+varying vec2 v_texcord;
+
+void main(){
+    vec4 color = vec4(0,0,0,0);
+    color += 0.0026612646659533476 * texture2D(image, v_texcord.st + -5.0 * deltas * ISize);
+    color += 0.01344761071334243 * texture2D(image, v_texcord.st + -4.0 * deltas * ISize);
+    color += 0.0474084957625423 * texture2D(image, v_texcord.st + -3.0 * deltas * ISize);
+    color += 0.1166060836728201 * texture2D(image, v_texcord.st + -2.0 * deltas * ISize);
+    color += 0.20009683975506104 * texture2D(image, v_texcord.st + -1.0 * deltas * ISize);
+    color += 0.2395594108605616 * texture2D(image, v_texcord.st + 0.0 * deltas * ISize);
+    color += 0.20009683975506104 * texture2D(image, v_texcord.st + 1.0 * deltas * ISize);
+    color += 0.1166060836728201 * texture2D(image, v_texcord.st + 2.0 * deltas * ISize);
+    color += 0.0474084957625423 * texture2D(image, v_texcord.st + 3.0 * deltas * ISize);
+    color += 0.01344761071334243 * texture2D(image, v_texcord.st + 4.0 * deltas * ISize);
+    color += 0.0026612646659533476 * texture2D(image, v_texcord.st + 5.0 * deltas * ISize);
+    gl_FragColor = color;
+}

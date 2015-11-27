@@ -1,0 +1,11 @@
+precision mediump float;
+uniform vec4 color;
+varying float v_life;
+
+void main(){
+
+    //start the fade-out when there's a half-second of life left
+    //float alpha = mix(1.0, 0.0, clamp(1.0-v_life/500.0, 0.0, 1.0));
+    gl_FragColor = color;
+    //gl_FragColor.a = 1.0;
+}

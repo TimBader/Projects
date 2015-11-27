@@ -1,0 +1,112 @@
+#extension GL_EXT_draw_buffers:require
+precision highp float;
+
+uniform sampler2D albetoMap;
+uniform sampler2D reflectanceMap;
+uniform sampler2D roughnessMap;
+uniform sampler2D normalMap;
+uniform vec4 eyePos;
+uniform mat4 worldMatrix;
+
+uniform samplerCube enviromentMap;
+uniform samplerCube enviromentMapB;
+uniform vec2 noise;
+
+varying vec2 v_texPos;
+varying vec3 v_worldPos;
+varying vec3 v_normal;
+varying vec3 v_tangent;
+
+uniform sampler2D G;
+uniform sampler2D P;
+
+vec3 Gfetch(float idx){
+    vec2 tc = vec2( float(idx)/256.0 , 0.0 );
+    vec3 v =texture2D(G,tc).xyz;
+    v = v-vec3(0.5,0.5,0.5);
+    v = 2.0*v;
+    return v;
+}
+
+float Pfetch(float idx){
+    vec2 tc = vec2( idx/256.0 , 0.0 );
+    float tmp = texture2D(P,tc).r;
+    return floor(tmp*255.0);
+}
+
+vec3 gradient3(vec3 p){
+    float tmp1 = Pfetch(mod(p.y,256.0));
+    return Gfetch( mod( p.x+tmp1, 256.0 ));
+}
+float noise2(vec3 p){
+	//float noisescale = 2.0;
+    p=noise[0]*p;
+    vec3 L = floor(p);
+    vec3 H = ceil(p);
+    vec3 a = vec3(L.x,H.y,0.0);
+    vec3 c = vec3(H.x,H.y,0.0);
+    vec3 e = vec3(L.x,L.y,0.0);
+    vec3 f = vec3(H.x,L.y,0.0);
+	vec3 va = p-a;
+    vec3 vc = p-c;
+    vec3 ve = p-e;
+    vec3 vf = p-f;
+    vec3 ga = gradient3(a);
+    vec3 gc = gradient3(c);
+    vec3 ge = gradient3(e);
+    vec3 gf = gradient3(f);
+    float da=dot(ga,va);
+    float dc=dot(gc,vc);
+    float de=dot(ge,ve);
+    float df=dot(gf,vf);
+    
+    float pct = fract(p.x);
+    pct = pct*pct*(3.0-2.0*pct);
+    float avg_ac = mix(da,dc,pct);
+    float avg_ef = mix(de,df,pct);
+    pct = fract(p.y);
+    pct = pct*pct*(3.0-2.0*pct);
+    float avg = mix(avg_ef,avg_ac,pct);
+    return avg;
+}
+
+void main(){
+	vec3 newNormal;
+	vec3 normalMapColor = texture2D(normalMap, v_texPos).xyz;
+	normalMapColor = normalMapColor*2.0-vec3(1.0,1.0,1.0);//Remaping to (-1..1)range
+	vec3 tangent = normalize(v_tangent - dot(v_tangent, v_normal) * v_normal);
+	vec3 biTangent = cross(tangent, v_normal);
+	biTangent = normalize(biTangent);
+	mat3 Q = mat3(tangent.x,biTangent.x,v_normal.x,tangent.y,biTangent.y,v_normal.y,tangent.z,biTangent.z,v_normal.z);
+	vec3 newNewNormal = normalize((vec4(normalMapColor*Q,0.0)*worldMatrix).xyz);
+	
+	vec4 noiseColor = vec4(255.0,0.0,0.0,0.0);
+
+	vec3 p = newNewNormal.xyz;
+	float val =0.0;
+	float m = 1.0;
+	float s = 1.0;
+	for(int i=0; i<8; ++i)
+	{
+		val += m * noise2(s*p);
+		s *=2.0;
+		m *= 0.5;
+	}
+	val = clamp(val,0.0,noise[1]);
+	
+	vec3 viewVector = v_worldPos-eyePos.xyz;
+	vec3 reflectVector = reflect(viewVector, newNewNormal).xyz;
+	vec3 envColor = textureCube(enviromentMap,reflectVector).rgb;
+	vec3 envColorB = textureCube(enviromentMapB,reflectVector).rgb;
+
+	float roughness = texture2D(roughnessMap, v_texPos).r;
+	
+	vec3 envColorF = mix(envColorB, envColor, roughness*roughness);	
+	
+	vec3 reflectance = texture2D(reflectanceMap, v_texPos).rgb;
+	
+	gl_FragData[0] = vec4(v_worldPos, envColorF.r);//[3] = spec r but now just specPower
+	gl_FragData[1] = vec4(newNewNormal, envColorF.g);//[3] = spec g
+	gl_FragData[2] = vec4(texture2D(albetoMap, v_texPos).rgb+texture2D(albetoMap, v_texPos).rgb*val, envColorF.b); //[3] = spec b
+	gl_FragData[3] = vec4(reflectance*reflectance, roughness); //[3] = spec power
+}

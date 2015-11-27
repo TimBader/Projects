@@ -1,0 +1,22 @@
+attribute vec2 position;
+uniform mat4 viewProjMatrix;
+uniform sampler2D postex;
+uniform sampler2D veltex;
+varying float v_life;
+
+void main(){
+    
+    vec4 c = texture2D(postex, position);
+    vec4 p = vec4(c.xyz, 1.0);
+    
+    c = texture2D(veltex, position);
+    v_life = c.w;   
+
+    if( v_life <= 0.0 )
+        gl_Position = vec4(2.0,2.0,2.0,1.0);
+    else
+        gl_Position=p*viewProjMatrix;
+
+    gl_PointSize = 4.0;
+    
+}

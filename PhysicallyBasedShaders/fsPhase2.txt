@@ -1,0 +1,102 @@
+#extension GL_EXT_frag_depth : require
+precision highp float;
+uniform sampler2D posTexture;
+uniform sampler2D normalTexture;
+uniform sampler2D albetoTexture;
+uniform sampler2D reflectanceTexture;
+uniform vec4 lightPos;
+uniform vec4 lightColor;
+uniform vec3 lightAttenuate;
+uniform vec2 windowSize;
+uniform vec4 eyePos;
+uniform sampler2D depth_texture;
+uniform float ambientDiffuseMaxPower;
+uniform float lightNum;
+uniform vec3 ambientColor;
+
+varying vec2 v_texcord;
+
+
+
+uniform mat4 light_viewMatrix;
+uniform mat4 light_projMatrix;
+uniform vec2 light_hitheryon;
+uniform sampler2D shadowBuffer;
+
+
+
+
+float MaxFogDistanceSqrd = 90000.0;
+
+vec3 FresnelSchlick(vec3 SpecularColor, vec3 E, vec3 H){
+	return SpecularColor + (1.0 - SpecularColor) * pow(1.0 - clamp(dot(E,H),0.0,1.0), 5.0);
+}
+
+vec3 FresnelSchlickWithRoughness(vec3 SpecularColor, vec3 E, vec3 N, float Gloss){
+	return SpecularColor + (1.0 - SpecularColor)*(pow(1.0 - clamp(dot(E,N),0.0,1.0), 5.0)/(4.0-3.0*Gloss));
+}
+
+void main(){
+	vec4 v1 = texture2D(posTexture, v_texcord);
+	vec4 v2 = texture2D(normalTexture, v_texcord);
+	vec4 v3 = texture2D(albetoTexture, v_texcord);
+	vec4 v4 = texture2D(reflectanceTexture, v_texcord);
+	vec4 worldPos = vec4(v1.xyz,1.0);
+	vec3 normal = v2.xyz;
+	vec3 albetoColor = v3.rgb;
+	vec3 envColor = vec3(v1.a,v2.a,v3.a);
+	vec3 reflectanceColor = vec3(v4.r,v4.g,v4.b);
+	float gloss = v4.a;	
+	
+	vec4 pw = worldPos*light_viewMatrix;
+	float z1 = (-pw.z-light_hitheryon[0]) / light_hitheryon[1];
+	pw = pw * light_projMatrix;
+	pw.xy /= pw.w; //This is a homogeneous divide
+	pw.xy = (pw.xy + vec2(1.0))*0.5;
+
+	vec2 z2 = texture2D(shadowBuffer, pw.xy).rg;
+	float mean = z2.r;
+	float shadowFactor = 1.0;
+	
+	if (z1 < mean+0.0005 || any(lessThan(pw.st, vec2(0.01,0.01))) || any(greaterThan(pw.st, vec2(0.99,0.99)))){
+		shadowFactor = 1.0;
+	}
+	else{
+		float variance = z2.g-mean*mean;
+		float delta = z1 - mean;
+		delta = max(0.0, delta);
+		float litpct = variance / (variance + delta*delta);
+		shadowFactor = litpct;
+		shadowFactor = pow(clamp(litpct, 0.0, 1.0),4.0);
+	}
+	
+	vec3 viewVector = normalize(eyePos.xyz - worldPos.xyz);
+	vec3 lightVector = (lightPos - worldPos*lightPos.w).xyz;
+	float lightDistance = length(lightVector);
+	lightVector /= lightDistance;
+	vec3 halfAngle = normalize(lightVector + viewVector);
+	float AttenuationCoeff = clamp(1.0/(lightAttenuate[2]*lightDistance*lightDistance + lightAttenuate[1]*lightDistance + lightAttenuate[0]),0.0,1.0);
+	
+	//Direct Lighting
+	float nDOTl = clamp(dot(normal, lightVector),0.0,1.0);
+
+	float specularPower = pow(4048.0, gloss);
+	
+	vec3 DiffuseC = albetoColor*nDOTl;
+	
+	vec3 SpecularC = FresnelSchlick(reflectanceColor,lightVector,halfAngle)*((specularPower + 2.0)/8.0)*pow(clamp(dot(normal, halfAngle),0.0,1.0),specularPower) * nDOTl;
+
+	vec3 ViewFresnel =  FresnelSchlickWithRoughness(reflectanceColor, normal, viewVector, gloss);
+	
+	vec3 AmbientSpecularColor = ViewFresnel*envColor;
+	
+	vec3 newDiffuseC = (1.0-SpecularC*shadowFactor)*DiffuseC*(1.0-ViewFresnel); //Respecting energy conservation restraints
+	
+	vec3 newColor = (newDiffuseC + SpecularC)*shadowFactor*lightColor.rgb+AmbientSpecularColor+clamp(1.0-shadowFactor,0.0,ambientDiffuseMaxPower)*newDiffuseC*lightColor.rgb;
+	
+	gl_FragColor.rgb = newColor*AttenuationCoeff;
+	
+	gl_FragColor.a = 1.0;
+	
+	gl_FragDepthEXT = texture2D(depth_texture,v_texcord).r;	
+}

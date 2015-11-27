@@ -1,0 +1,50 @@
+//precision highp float;
+//uniform sampler2D image;
+//uniform vec4 basetexture_size;
+//uniform vec2 deltas;
+//varying vec2 v_texcord;
+//void main(){
+	//gl_FragColor = texture2D(image, vec2(v_texcord.x, v_texcord.y*-1.0));
+	//gl_FragColor = vec4(1.0*v_texcord.x,1.0*v_texcord.y,0.0,1.0);	
+//}
+
+precision highp float;
+uniform samplerCube cubeMap;
+uniform vec4 basetexture_size;
+uniform vec2 deltas;
+uniform vec3 dVec;
+uniform vec2 axisSelect;
+
+varying vec2 v_texcord;
+
+mat3 createRotMatrix(float axisSelect, float angle){
+	float COS = cos(angle);
+	float SIN = sin(angle);
+	if (axisSelect == 0.0){
+		return mat3(1.0,0.0,0.0, 0.0,COS,-SIN, 0.0,SIN,COS);
+	}
+	if (axisSelect == 1.0){
+		return mat3(COS,0.0,SIN, 0.0,1.0,0.0, -SIN,0.0,COS);
+	}
+	return mat3(COS,-SIN,0.0, SIN,COS,0.0, 0.0,0.0,1.0);
+}
+
+vec4 getColor(vec2 cord, samplerCube cMap, vec3 dVec, vec2 axisSelect){
+	float PId4 = 90.0;
+	float PId2 = 180.0;
+	float rotateValue1 = PId4 - PId2*cord.s;
+	vec3 rotate1 = vec3(0.0,0.0,1.0)*createRotMatrix(1.0,rotateValue1*3.145/180.0);
+	float rotateValue2 = PId4 - PId2*cord.t;
+	vec3 rotate2 = vec3(0.0,0.0,1.0)*createRotMatrix(0.0,-rotateValue2*3.145/180.0);
+	return textureCube(cMap,normalize(rotate1+rotate2));
+}
+
+void main(){
+    vec4 color = vec4(0,0,0,0);
+    //color += 0.006646032999923535 * getColor(v_texcord.st + -2.0 * deltas*basetexture_size.z, cubeMap, dVec, axisSelect);
+    //color += 0.1942255544092176 * getColor(v_texcord.st + -1.0 * deltas*basetexture_size.z, cubeMap, dVec, axisSelect);
+    color += 1.0 * getColor(v_texcord.st + 0.0 * deltas*basetexture_size.z, cubeMap, dVec, axisSelect);
+    //color += 0.1942255544092176 * getColor(v_texcord.st + 1.0 * deltas*basetexture_size.z, cubeMap, dVec, axisSelect);
+    //color += 0.006646032999923535 * getColor(v_texcord.st + 2.0 * deltas*basetexture_size.z, cubeMap, dVec, axisSelect);
+    gl_FragColor = color;
+}

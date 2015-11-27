@@ -1,0 +1,26 @@
+ObjHandler
+//Organizes and contians objects. Contains funtions that preform differnt operations
+with these objects
+
+.addDictionary(DictionaryName)
+//Adds a new dictionary to the list of dictionarys by the name
+
+
+.addObject(DictionaryName, ObjectName, Object)
+//Adds the Object to the list keyed with the ObjectName to the dictionary pointed
+ by the DictionaryName
+
+.getObject(DictionaryName, ObjectName) - returns list of objects
+//returns the list of Objects from the list keyed from ObjectName inside of the 
+dictionary keyed by DictionaryName
+
+.updateObject(DictionaryName, ObjectName, updateFunctionSpecificsVars)
+//Updates all the objects inside the list keyed by ObjectName inside the dictionary
+keyed by the DictionaryName
+
+.updateDictionary(DictionaryName, updateFunctionSpecificsVars)
+//Updates all the lists of objects inside the dictionary keyed by DictionaryName
+
+.updateAll(updateFunctionSpecificsVars)
+//Updates all the lists of objects inside all the dictionaries inside the ObjectHandler's
+ main dictionary

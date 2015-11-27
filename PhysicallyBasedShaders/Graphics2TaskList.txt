@@ -1,0 +1,52 @@
+*Class specific required
+---Done---
+
+
+---Needs Implementation---
+
+
+---Needs Reviewed--- Test/Review
+ObjConverter.js Flexibility Upgrade v1.1 s/Tim
+SpecMapping - Intensity/Color v1.1 s/Tim
+Emissive Mapping v1.0 s/Tim
+*Deferred Rendering v1.1 s/Tim
+*BumpMapping v1.1 s/Tim
+Material Assignments in Engine v1.0 s/Tim
+ObjectHandling Improvements v1.0 s/Tim
+Ambient Diffuse Lighting v1.0 s/Tim
+
+---In Progress--- Design/Develop  -version starts at v1.0 -if need revision from reviewd add v0.1 to version, from DONE add v1.0 to version
+SVN Implementation v1.0 - Dan
+Billboards v1.0 - Dan
+Deferred Rendering Improvements\Optimizations v1.0 - Tim
+Fresnel Effect v1.1 - Tim
+Fog Effect v1.0 - Tim
+*Height Map thing v1.0 - James
+Non moving collision detection v1.0 - James
+Car Model v1.2 - James/M
+Wheel Model v1.1 - James/M
+
+
+
+---Tasks--- Product Backlog
+Art - Graphics
+	Billboards: Trees, Particles, Sun, Pedestrians
+	HeightMap for levels
+	Sounds (Vehicle and Music)
+	EnviromentMaps-Rendering
+	
+Programming - Graphics
+	Car Movement Physics
+	Collision
+	*Car-World Interaction Physics/Kinematics
+	Water Shader
+	Heightmap
+	*Environment mapping
+	*SkyBox
+	*Particle System
+	Planar Reflection?
+	Fur-grass
+	Modified BDRF lighting system - Requires Enviroment Mapping
+	*Shadows - Projective Shadows - Stencil Shadows - Shadow Buffer
+
+Gameplay

@@ -1,0 +1,68 @@
+#extension GL_EXT_frag_depth : require
+precision highp float;
+uniform sampler2D posTexture;
+uniform sampler2D normalTexture;
+uniform sampler2D colorTexture;
+uniform sampler2D emisTexture;
+uniform vec4 lightPos;
+uniform vec4 lightColor;
+uniform vec4 lightShineDirection;
+uniform vec3 lightAttenuate;
+uniform vec2 windowSize;
+uniform vec4 eyePos;
+uniform sampler2D depth_texture;
+uniform float ambientDiffuseMaxPower;
+uniform float lightNum;
+
+varying vec2 v_texcord;
+
+float MaxFogDistanceSqrd = 90000.0;
+
+void main(){
+	//gl_FragColor = vec4(0.0,0.0,0.0,0.0);
+	//vec2 texcord = gl_FragCoord.xy * windowSize;
+	vec4 v1 = texture2D(posTexture, v_texcord);
+	vec4 v2 = texture2D(normalTexture, v_texcord);
+	vec4 v3 = texture2D(colorTexture, v_texcord);
+	vec4 v4 = texture2D(emisTexture, v_texcord);
+	vec4 worldPos = vec4(v1.xyz,1.0);
+	vec3 normal = normalize(v2.xyz);
+	vec3 color = v3.rgb;
+	vec3 envColor = vec3(v1.a,v2.a,v3.a);
+	vec3 EmissiveColor = vec3(v4.r,v4.g,v4.b);
+	
+	vec3 viewVector = eyePos.xyz - worldPos.xyz;
+	vec3 viewVectorNormaled = normalize(viewVector);
+	vec3 lightVector = (lightPos - worldPos*lightPos.w).xyz;
+	float lightDistance = length(lightVector);
+	lightVector /= lightDistance;
+	float AttenuationCoeff = clamp(1.0/(lightAttenuate[2]*lightDistance*lightDistance + lightAttenuate[1]*lightDistance + lightAttenuate[0]),0.0,1.0);
+	
+	float indexOfRefraction = 1.33;
+	vec3 halfAngle = lightVector + viewVector;
+	halfAngle = normalize(halfAngle);
+	float R0 = v4.a;
+	float FresnelCoeff = R0 + (1.0 - R0) * pow((1.0 - dot(normal, viewVectorNormaled)), 5.0);
+	//float gloss = 0.1;
+	//float FresnelCoeff = R0 + (max(gloss, R0) - R0) * pow((1.0 - dot(normal, viewVectorNormaled)), 5.0);
+
+	FresnelCoeff = clamp(FresnelCoeff,0.0,1.0);
+	
+	//Poor fog effect calculating
+	vec3 FogColor = vec3(0.0,.1,.1);
+	FogColor = envColor;
+
+	float FogCoeff = clamp(dot(viewVector, viewVector)/90000.0,0.0,1.0);
+	
+	//Diffuse with ambient testing
+	float LdotN = dot(lightVector, normal);	
+	float DiffuseCoeff = ambientDiffuseMaxPower + clamp(LdotN, 0.0, 1.0-ambientDiffuseMaxPower);	
+	
+	vec3 newColor = ((((DiffuseCoeff*lightColor.rgb*color.rgb)*AttenuationCoeff)*(1.0-FresnelCoeff))+(envColor*FresnelCoeff)/lightNum + EmissiveColor/lightNum)*(1.0-FogCoeff)+(FogColor*FogCoeff)/lightNum;	
+	
+	gl_FragColor.rgb = newColor;
+	
+	gl_FragColor.a = 1.0;
+	
+	gl_FragDepthEXT = texture2D(depth_texture,v_texcord).r;	
+}

@@ -1,0 +1,25 @@
+attribute vec3 position;
+attribute vec2 texcord;
+attribute vec3 vertexNormal;
+attribute vec3 vertexTangent;
+
+uniform mat4 viewProjMatrix;
+uniform mat4 worldMatrix;
+
+varying vec2 v_texPos;
+varying vec3 v_worldPos;
+varying vec3 v_normal;
+varying vec3 v_tangent;
+
+vec4 pos;
+
+void main(){
+	v_texPos = texcord.st;
+	
+	v_normal = vertexNormal; //??Need to * worldMatrix?
+	v_tangent = vertexTangent;
+	
+	pos = vec4(position.xyz,1.0) * worldMatrix;
+	v_worldPos = pos.xyz;
+	gl_Position = pos*viewProjMatrix;
+}

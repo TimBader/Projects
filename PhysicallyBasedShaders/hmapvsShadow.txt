@@ -1,0 +1,55 @@
+attribute vec2 a_texcoord;
+
+uniform sampler2D heighttexture;
+uniform vec4 heighttexture_size;
+uniform mat4 viewMatrix;
+uniform mat4 worldMatrix;
+uniform mat4 projMatrix;
+
+uniform vec3 mins;
+uniform vec3 maxs;
+
+varying float v_viewPosz;
+
+void main(){    
+    vec3 p;
+    vec3 n,e,s,w;
+    
+    p.xz = a_texcoord;
+    p.y = texture2D(heighttexture,p.xz).r;
+    
+    n.x = s.x = a_texcoord.x;
+    n.z = a_texcoord.y - heighttexture_size[3];
+    s.z = a_texcoord.y + heighttexture_size[3];
+    n.y = texture2D(heighttexture,s.xz).r;      //need to exchange s<->n tex coords
+    s.y = texture2D(heighttexture,n.xz).r;
+   
+    e.x = a_texcoord.x + heighttexture_size[2];
+    w.x = a_texcoord.x - heighttexture_size[2];
+    e.z = w.z = a_texcoord.y;
+    e.y = texture2D(heighttexture,e.xz).r;
+    w.y = texture2D(heighttexture,w.xz).r;
+     
+   
+    p = mix(mins,maxs,p);
+    n = mix(mins,maxs,n);
+    e = mix(mins,maxs,e);
+    s = mix(mins,maxs,s);
+    w = mix(mins,maxs,w);
+    
+    vec3 v1 = s-p;
+    vec3 v2 = e-p;
+    vec3 n1 = cross(v1,v2);
+    
+    vec3 v1b = n-p;
+    vec3 v2b = w-p;
+    vec3 n2 = cross(v1b,v2b);
+	
+	v_viewPosz = (vec4(p,1.0)*worldMatrix*viewMatrix).z;
+	
+	v_viewPosz *= -1.0;
+    
+    gl_Position = vec4(p,1.0) * viewMatrix * projMatrix;
+}
+
+    
